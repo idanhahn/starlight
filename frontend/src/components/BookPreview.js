@@ -1,11 +1,12 @@
-import { useState } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useForm, Controller } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { Box, TextField, IconButton, Button, Typography } from '@mui/material';
-import DatePicker from '@mui/lab/DatePicker';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import DatePicker from '@mui/lab/DatePicker';
+import { addDays, differenceInCalendarDays } from 'date-fns';
 
 const GET_VEHICLE_WTIH_BOOKING = gql`
   query GET_VEHICLE_WITH_BOOKING($id: ID!) {
@@ -39,7 +40,7 @@ const CREATE_BOOKING = gql`
     $user_id: ID!
     $vehicle_id: ID!
   ) {
-    createNote(
+    createBooking(
       created: $created
       updated: $updated
       deleted: $deleted
@@ -55,9 +56,14 @@ const CREATE_BOOKING = gql`
 `;
 
 export default function BookPreview({ vehicleId, handleClose }) {
-  const [value, setValue] = useState(null);
+  const navigate = useNavigate();
 
-  const { control, register, handleSubmit } = useForm({});
+  const { control, watch, handleSubmit } = useForm({
+    defaultValues: {
+      fromDate: new Date(),
+      toDate: addDays(new Date(), 1),
+    },
+  });
 
   const { loading, error, data } = useQuery(GET_VEHICLE_WTIH_BOOKING, {
     variables: {
@@ -76,9 +82,29 @@ export default function BookPreview({ vehicleId, handleClose }) {
 
   if (mutationError) return `Error! ${error}`;
 
-  const onSubmit = (mutationData) => {
-    console.log(mutationData);
+  const onSubmit = (booking) => {
+    console.log(booking);
+    createBooking({
+      variables: {
+        created: '',
+        updated: '',
+        deleted: '',
+        from: booking.fromDate,
+        to: booking.toDate,
+        cost: +`${
+          differenceInCalendarDays(toDate, fromDate) * data.Vehicle.cost
+        }`,
+        user_id: '1',
+        vehicle_id: vehicleId,
+      },
+    }).then((response) => {
+      console.log(response);
+      navigate(`/booking/${response.data.createBooking.id}`);
+    });
   };
+
+  const fromDate = watch('fromDate');
+  const toDate = watch('toDate');
 
   return (
     <Box>
@@ -116,33 +142,43 @@ export default function BookPreview({ vehicleId, handleClose }) {
         {data.Vehicle.description}
       </Typography>
 
+      {/* Daily COST */}
+      <Typography variant="h3" color="primary">
+        ${data.Vehicle.cost}/DAY
+      </Typography>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* FROM DATE PICKER */}
         <Controller
-          name="datepicker_from"
-          control={control}
-          render={({ field }) => (
+          render={({ field: { onChange, value } }) => (
             <DatePicker
-              label="From date"
-              onChange={(date) => field.onChange(date)}
+              label="From Date"
+              value={value}
+              onChange={onChange}
               renderInput={(params) => <TextField {...params} />}
             />
           )}
+          control={control}
+          name="fromDate"
         />
 
         {/* TO DATE PICKER */}
-        <DatePicker
-          label="To date"
-          value={value}
-          onChange={(newValue) => {
-            setValue(newValue);
-          }}
-          renderInput={(params) => <TextField {...params} />}
-          register
+        <Controller
+          render={({ field: { onChange, value } }) => (
+            <DatePicker
+              label="To Date"
+              value={value}
+              onChange={onChange}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          )}
+          control={control}
+          name="toDate"
         />
-        {/* COST */}
-        <Typography variant="h3" color="primary">
-          ${data.Vehicle.cost}/DAY
+        {/* TOTAL COST */}
+
+        <Typography variant="h4" color="success">
+          ${differenceInCalendarDays(toDate, fromDate) * data.Vehicle.cost}
         </Typography>
 
         {/* CANCEL BUTTON*/}

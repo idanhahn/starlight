@@ -1,15 +1,10 @@
-import { Grid } from '@mui/material';
-
+import { Container } from '@mui/material';
+import Navbar from './Navbar';
 export default function Layout({ children }) {
   return (
-    <Grid
-      container
-      sx={{
-        pl: { xs: 0, md: '10%' },
-        pr: { xs: 0, md: '10%' },
-      }}
-    >
-      {children}
-    </Grid>
+    <div>
+      <Navbar />
+      <Container maxWidth="xl">{children}</Container>
+    </div>
   );
 }

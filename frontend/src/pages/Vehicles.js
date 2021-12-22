@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useState, useEffect } from 'react';
+import { gql, useLazyQuery } from '@apollo/client';
 import {
   Modal,
   Box,
@@ -11,8 +11,6 @@ import {
   MenuItem,
   OutlinedInput,
   InputAdornment,
-  TextField,
-  Typography,
 } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 
@@ -21,8 +19,20 @@ import BookPreview from '../components/BookPreview';
 import { useForm } from 'react-hook-form';
 
 const GET_VEHICLES = gql`
-  query GET_VEHICLES {
-    allVehicles {
+  query GET_VEHICLES(
+    $page: Int
+    $perPage: Int
+    $sortField: String
+    $sortOrder: String
+    $filter: VehicleFilter
+  ) {
+    allVehicles(
+      page: $page
+      perPage: $perPage
+      sortField: $sortField
+      sortOrder: $sortOrder
+      filter: $filter
+    ) {
       id
       img
       size
@@ -34,6 +44,20 @@ const GET_VEHICLES = gql`
 `;
 
 export default function Vehicles() {
+  useEffect(() => {
+    getFilteredVehicles({
+      variables: {
+        page: 0,
+        perPage: 10,
+        sortField: 'cost',
+        sortOrder: 'asc',
+      },
+    });
+  }, []);
+
+  const [getFilteredVehicles, { loading, error, data }] =
+    useLazyQuery(GET_VEHICLES);
+
   // Modal related logic:
   const [open, setOpen] = useState({
     id: null,
@@ -41,14 +65,17 @@ export default function Vehicles() {
   });
 
   const handleOpen = (id) => {
-    console.log(id);
     setOpen({
       id: id,
       showDialog: true,
     });
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () =>
+    setOpen({
+      id: null,
+      showDialog: false,
+    });
 
   // Filter form related logic:
   const { register, handleSubmit } = useForm({
@@ -60,11 +87,18 @@ export default function Vehicles() {
   });
 
   const onSubmit = (filterData) => {
-    console.log(filterData);
+    getFilteredVehicles({
+      variables: {
+        page: 0,
+        perPage: 10,
+        filter: {
+          size: filterData.size,
+          cost_gt: +filterData.costMin,
+          cost_lt: +filterData.costMax,
+        },
+      },
+    });
   };
-
-  // Query related logic:
-  const { loading, error, data } = useQuery(GET_VEHICLES);
 
   if (loading) return 'Loading';
 
@@ -113,8 +147,11 @@ export default function Vehicles() {
             <OutlinedInput
               id="cost-range-min"
               label="From"
-              startAdornment={<InputAdornment>$</InputAdornment>}
+              startAdornment={
+                <InputAdornment position="start">$</InputAdornment>
+              }
               {...register('costMin')}
+              defaultValue={0}
             />
           </FormControl>
 
@@ -123,7 +160,9 @@ export default function Vehicles() {
             <OutlinedInput
               id="cost-range-max"
               label="From"
-              startAdornment={<InputAdornment>$</InputAdornment>}
+              startAdornment={
+                <InputAdornment position="start">$</InputAdornment>
+              }
               {...register('costMax')}
             />
           </FormControl>
@@ -144,11 +183,20 @@ export default function Vehicles() {
       </Grid>
 
       {/* VEHICLE LIST*/}
-      {data.allVehicles.map((vehicle) => (
-        <Grid item xs={12} sm={6} md={4} key={vehicle.id}>
-          <VehicleCard vehicle={vehicle} handleOpenBook={handleOpen} />
-        </Grid>
-      ))}
+      {data &&
+        data.allVehicles.map((vehicle) => (
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={4}
+            sx={{ display: 'flex' }}
+            key={vehicle.id}
+          >
+            <VehicleCard vehicle={vehicle} handleOpenBook={handleOpen} />
+          </Grid>
+        ))}
+
       <Modal
         open={open.showDialog}
         onClose={handleClose}
