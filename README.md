@@ -1,0 +1,23 @@
+boilerplate project built around p2p car renting application 
+with the following technologies:
+- Express
+- Graphql
+- MongoDB
+- Auth0 (V)
+- ReactJS (MUI, React Router) 
+  - Forms (input) - (V)
+  - Date picker (rent timline) - (V)
+  - Table with selection 
+  - filterning and pagination
+- Apollo server
+- Apollo client - (V)
+- WebSockets (socketIO)
+- upload images
+- emails
+- billing?
+- invoices?
+- graphs (Rechart, )
+- rabbitMQ?
+- Some animations and transactions
+- generate PDF
+- calendary
