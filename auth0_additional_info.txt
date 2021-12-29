@@ -1,0 +1,4 @@
+Connect Auth0 DB to MongoDB:
+https://auth0.com/blog/connecting-auth0-to-mongodb/
+
+[Probably] need to set only one database connection in Application.Connection

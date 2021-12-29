@@ -1,0 +1,164 @@
+General:
+--------
+boilerplate project built around p2p car renting application 
+with the following technologies:
+- Express
+- Graphql
+- MongoDB
+- Auth0 (V)
+- ReactJS (MUI, React Router) 
+  - Forms (input) - (V)
+  - Date picker (rent timline) - (V)
+  - Table with selection 
+  - filterning and pagination
+- Apollo server
+- Apollo client - (V)
+- WebSockets (socketIO)
+- upload images
+- emails
+- billing?
+- invoices?
+- graphs (Rechart, )
+- rabbitMQ?
+- Some animations and transactions
+- generate PDF
+- calendary
+
+Main features:
+--------------
+1. Get all vehicle by filters (availability, size, cost)
+2. Get individual vehicle details (img, model{year, make}, current schedule, cost, size, owner)
+3. Book a vehicle with timeline
+4. Update/cancel booking (Optional)
+5. List all Booking by user
+6. List all Vehicles by user 
+7. Add vehicle to pull
+8. Update/remove vehicle (Optional)
+9. Notification Center (sucessfull booking, adding vehicle, etc')
+
+
+Database schema:
+----------------
+
+User{
+  id
+  created
+  updated
+  deleted
+  firstName
+  lastName
+  email
+  vehicles
+  bookings
+}
+
+Vehicle{
+  id
+  created
+  updated
+  deleted
+  img
+  size
+  cost
+  model{
+    year,
+    make
+  }
+  owner
+  bookings?
+}
+
+Booking{
+  id
+  created
+  updated
+  deleted
+  from
+  to
+  cost
+  user
+  vehicle
+}
+
+Notification{
+  id
+  created
+  updated
+  deleted
+  message
+  meta: {
+    readAt
+    openAt
+    redirect
+  }
+  user
+}
+
+Frontend pages:
+---------------
+1. Vehicles:
+- path: '/'
+- content: view vehicles, filter according to size, cost and availability
+- components:
+  - vehicle preview card
+  - vehicle detailed view (modal, owner, availability)
+- insperation: booking.com, airbnb.com
+
+2. Booking confirmation
+- path: /reserve/:vehicleId
+- content: booking overview - vehicle details, dates, total cost, owner (contact owner?)
+- optional: integrate Stripe payments (idanhahn2021) 
+- additionals: notification for owner (new listing), email confirmation for user, 
+
+3. Add vehicle
+- path: /new-vehicle
+- content: form for new vehicle, add images
+
+4. List vehicles
+- path: /my-vehicles
+- content: list all vehicles by owner
+- components:
+  - vehicle preview card
+  - vehicle detailed view with, availability)
+
+5. List bookings
+- path: /bookings
+- content: total booked revenue, selectable table with all bookings, option to send notification, revenue chart
+- additionals: only available for users with owned vehicles
+
+6. My bookings?
+- path: /my-bookings
+- content: all booking by user, booking history
+
+shared components:
+- navbar
+- notification Center with list of notifications (accordion) - Notificaiton page?
+
+APIs:
+-----
+
+Queries:
+- graphql/vehicles 
+list all vehicles, with filter and pagination
+
+- graphql/vehicle(id)
+get vehicle by id
+
+- graphql/bookings
+list all booking with filter and pagination
+
+- graphql/booking(id)
+get booking by id
+
+- 
+
+Mutation:
+- graphql/createVehicle(vehicleInput)
+create new vehicle (and assign to owner user)
+
+- graphql/createBooking(bookingInput)
+create new booking
+
+
+
+

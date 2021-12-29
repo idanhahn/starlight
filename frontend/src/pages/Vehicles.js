@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { gql, useLazyQuery } from '@apollo/client';
 import {
   Modal,
@@ -55,6 +56,8 @@ export default function Vehicles() {
     });
   }, []);
 
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
+
   const [getFilteredVehicles, { loading, error, data }] =
     useLazyQuery(GET_VEHICLES);
 
@@ -65,6 +68,8 @@ export default function Vehicles() {
   });
 
   const handleOpen = (id) => {
+    if (!isAuthenticated) return loginWithRedirect();
+
     setOpen({
       id: id,
       showDialog: true,

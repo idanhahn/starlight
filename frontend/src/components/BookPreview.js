@@ -1,10 +1,17 @@
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { Box, TextField, IconButton, Button, Typography } from '@mui/material';
+import {
+  Typography,
+  TextField,
+  Divider,
+  IconButton,
+  Button,
+  CardContent,
+  Card,
+  Box,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import DatePicker from '@mui/lab/DatePicker';
 import { addDays, differenceInCalendarDays } from 'date-fns';
 
@@ -83,7 +90,8 @@ export default function BookPreview({ vehicleId, handleClose }) {
   if (mutationError) return `Error! ${error}`;
 
   const onSubmit = (booking) => {
-    console.log(booking);
+    // check if user logged into the platform:
+
     createBooking({
       variables: {
         created: '',
@@ -106,101 +114,166 @@ export default function BookPreview({ vehicleId, handleClose }) {
   const fromDate = watch('fromDate');
   const toDate = watch('toDate');
 
+  const vehicleImgStyle = {
+    maxWidth: '340px',
+  };
+
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       {/* CLOSE BUTTON */}
-      <IconButton color="secondary" onClick={handleClose}>
-        <CloseIcon />
-      </IconButton>
+      <Box id="closeButton" sx={{ display: 'flex' }}>
+        <Box display={{ flexGrow: 1 }} />
+        <IconButton color="secondary" onClick={handleClose}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
-      {/* VEHICLE IMG */}
-      <img src={data.Vehicle.img} alt="" />
+      <Box id="vehicleDetails" sx={{ display: 'flex', mb: 2 }}>
+        {/* VEHICLE IMG */}
+        <Box sx={{ mr: 6 }}>
+          <img style={vehicleImgStyle} src={data.Vehicle.img} alt="" />
+        </Box>
 
-      {/* VEHICLE TITLE */}
-      <Typography
-        variant="h4"
-        color="primary"
-      >{`${data.Vehicle.model.make} ${data.Vehicle.model.name}`}</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          {/* VEHICLE TITLE */}
+          <Typography
+            variant="h4"
+            color="primary"
+          >{`${data.Vehicle.model.make} ${data.Vehicle.model.name}`}</Typography>
+          {/* DESCRIPTION */}
+          <Typography variant="body1" color="secondary">
+            {data.Vehicle.description}
+          </Typography>
+        </Box>
+      </Box>
 
-      {/* OWNER NAME */}
-      <Typography variant="h5" color="secondaty">
-        {data.Vehicle.User.firstName}
-      </Typography>
-
-      {/* VIN */}
-      <Typography variant="h5" color="secondaty">
-        {data.Vehicle.vin}
-      </Typography>
-
-      {/* SIZE */}
-      <Typography variant="h5" color="secondaty">
-        {data.Vehicle.size}
-      </Typography>
-
-      {/* DESCRIPTION */}
-      <Typography variant="body1" color="primary">
-        {data.Vehicle.description}
-      </Typography>
-
-      {/* Daily COST */}
-      <Typography variant="h3" color="primary">
-        ${data.Vehicle.cost}/DAY
-      </Typography>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* FROM DATE PICKER */}
-        <Controller
-          render={({ field: { onChange, value } }) => (
-            <DatePicker
-              label="From Date"
-              value={value}
-              onChange={onChange}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          )}
-          control={control}
-          name="fromDate"
-        />
-
-        {/* TO DATE PICKER */}
-        <Controller
-          render={({ field: { onChange, value } }) => (
-            <DatePicker
-              label="To Date"
-              value={value}
-              onChange={onChange}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          )}
-          control={control}
-          name="toDate"
-        />
-        {/* TOTAL COST */}
-
-        <Typography variant="h4" color="success">
-          ${differenceInCalendarDays(toDate, fromDate) * data.Vehicle.cost}
-        </Typography>
-
-        {/* CANCEL BUTTON*/}
-        <Button
-          variant="outline"
-          color="error"
-          endIcon={<CancelOutlinedIcon />}
-          onClick={handleClose}
+      <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
+        <Box
+          id="additional Details"
+          sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}
         >
-          return
-        </Button>
+          <Typography variant="h6" sx={{ alignSelf: 'center' }}>
+            Additional Details
+          </Typography>
+          <Divider sx={{ mt: 2, mb: 4, mr: 2 }} />
+          <Box sx={{ display: 'flex', flexDirection: 'column', px: 2 }}>
+            {/* OWNER NAME */}
+            <Box
+              id="owner"
+              sx={{ display: 'flex', mb: 2, justifyContent: 'space-between' }}
+            >
+              <Typography variant="h6" color="secondaty">
+                Owner name:
+              </Typography>
+              <Typography variant="h6" color="primary" component="span">
+                {data.Vehicle.User.firstName}
+              </Typography>
+            </Box>
 
-        {/* BOOK/SUBMIT BUTTON*/}
-        <Button
-          type="submit"
-          variant="contained"
-          color="success"
-          endIcon={<ArrowForwardIosIcon />}
-        >
-          Book
-        </Button>
-      </form>
+            {/* VIN NUMBER */}
+            <Box
+              id="vin"
+              sx={{ display: 'flex', mb: 2, justifyContent: 'space-between' }}
+            >
+              <Typography variant="h6" color="secondaty">
+                VIN:
+              </Typography>
+              <Typography variant="h6" color="primary" component="span">
+                {data.Vehicle.vin}
+              </Typography>
+            </Box>
+
+            {/* SIZE */}
+            <Box
+              id="size"
+              sx={{ display: 'flex', justifyContent: 'space-between' }}
+            >
+              <Typography variant="h6" color="secondaty" gutterBottom>
+                Size:
+              </Typography>
+              <Typography variant="h6" color="primary" component="span">
+                {data.Vehicle.size}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Card sx={{ ml: 4 }}>
+          <CardContent>
+            {/* Daily COST */}
+            <Box sx={{ mt: 1, px: 2 }}>
+              <Typography variant="h4" color="secondary" sx={{ mb: 3 }}>
+                ${data.Vehicle.cost}{' '}
+                <Typography component="span" color="secondary" variant="h6">
+                  / DAY
+                </Typography>
+              </Typography>
+
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Box sx={{ mb: 4, display: 'flex' }}>
+                  {/* FROM DATE PICKER */}
+                  <Controller
+                    render={({ field: { onChange, value } }) => (
+                      <DatePicker
+                        label="From Date"
+                        value={value}
+                        onChange={onChange}
+                        renderInput={(params) => <TextField {...params} />}
+                      />
+                    )}
+                    control={control}
+                    name="fromDate"
+                  />
+
+                  {/* TO DATE PICKER */}
+                  <Controller
+                    render={({ field: { onChange, value } }) => (
+                      <DatePicker
+                        label="To Date"
+                        value={value}
+                        onChange={onChange}
+                        renderInput={(params) => <TextField {...params} />}
+                      />
+                    )}
+                    control={control}
+                    name="toDate"
+                  />
+                </Box>
+
+                {/* TOTAL COST */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', mb: 4 }}>
+                  <Box sx={{ display: 'flex' }}>
+                    <Typography variant="h5" color="secondary" sx={{ mr: 6 }}>
+                      Total Cost:
+                    </Typography>
+
+                    <Typography variant="h5" color="primary">
+                      $
+                      {differenceInCalendarDays(toDate, fromDate) *
+                        data.Vehicle.cost}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box sx={{ display: 'flex' }}>
+                  <Box sx={{ flexGrow: 1 }} />
+
+                  {/* BOOK/SUBMIT BUTTON*/}
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="success"
+                    sx={{ px: 12, py: 1.5 }}
+                  >
+                    RESERVE
+                  </Button>
+                  <Box sx={{ flexGrow: 1 }} />
+                </Box>
+              </form>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
     </Box>
   );
 }
