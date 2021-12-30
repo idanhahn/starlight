@@ -2,6 +2,12 @@
 import json
 import lorem
 import random
+from pymongo import MongoClient
+
+load_frontend = False 
+load_mongodb = True
+mongodb_name = 'mongo-test2'
+
 
 car_images = [
   'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'  ,
@@ -53,27 +59,15 @@ for notification in output['notifications']:
 for booking in output['bookings']:
   booking['to'] = booking['to'].replace('.000Z','Z')
 
-output_file = open('../../frontend/data/db.js', 'w')
-output_file.write("module.exports = ")
-output_file.write(json.dumps(output))
-output_file.close()
+if (load_frontend):
+  output_file = open('../../frontend/data/db.js', 'w')
+  output_file.write("module.exports = ")
+  output_file.write(json.dumps(output))
+  output_file.close()
 
+if (load_mongodb):
+  client = MongoClient('mongodb+srv://idanhahn:idan1980@cluster0.bpwoj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+  db = client[mongodb_name]
+  for collection in output:
+    db[collection].insert_many(output[collection])
 
-
-# car_images = [
-#   '../../res/img/pexels-photo-170811.jpeg',
-#   '../../res/img/pexels-photo-707046.jpeg',
-#   '../../res/img/pexels-photo-116675.jpeg',
-#   '../../res/img/pexels-photo-909907.jpeg',
-#   '../../res/img/pexels-photo-1164778.jpeg',
-#   '../../res/img/pexels-photo-244206.jpeg',
-#   '../../res/img/pexels-photo-810357.jpeg',
-#   '../../res/img/pexels-photo-1637859.jpeg',
-#   '../../res/img/pexels-photo-100656.jpeg',
-#   '../../res/img/pexels-photo-2127733.jpeg',
-#   '../../res/img/pexels-photo-119435.jpeg',
-#   '../../res/img/pexels-photo-1592384.jpeg',
-#   '../../res/img/pexels-photo-112460.jpeg',
-#   '../../res/img/pexels-photo-1149137.jpeg',
-#   '../../res/img/pexels-photo-116675.jpeg'
-# ]
