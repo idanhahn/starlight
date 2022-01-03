@@ -3,11 +3,11 @@ import json
 import lorem
 import random
 from pymongo import MongoClient
+from bson import ObjectId
 
 load_frontend = False 
 load_mongodb = True
-mongodb_name = 'mongo-test2'
-
+mongodb_name = 'starlight'
 
 car_images = [
   'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'  ,
@@ -26,6 +26,9 @@ car_images = [
   'https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
   'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'
 ]
+
+def convert_to_objectid(id):
+  return ObjectId(("000000000000000000000000" + str(id))[-24:]) 
 
 
 with open('./Users.json') as users_file:
@@ -48,16 +51,26 @@ output = {
 }
 
 for vehicle in output['vehicles']:
+  vehicle['_id'] = convert_to_objectid(vehicle['_id'])
+  vehicle['owner_id'] = convert_to_objectid(vehicle['owner_id'])
   vehicle['img'] = random.choice(car_images)
   vehicle['description'] = lorem.paragraph() if (random.uniform(0,1) > 0.3) else ''
 
 # fixing notification message
 for notification in output['notifications']:
+  notification['_id'] = convert_to_objectid(notification['_id'])
+  notification['user_id'] = convert_to_objectid(notification['user_id'])
   notification['message'] = lorem.paragraph()
 
 # fix booking to
 for booking in output['bookings']:
+  booking['_id'] = convert_to_objectid(booking['_id'])
+  booking['user_id'] = convert_to_objectid(booking['user_id'])
+  booking['vehicle_id'] = convert_to_objectid(booking['vehicle_id'])
   booking['to'] = booking['to'].replace('.000Z','Z')
+
+for user in output['users']:
+  user['_id'] = convert_to_objectid(user['_id'])
 
 if (load_frontend):
   output_file = open('../../frontend/data/db.js', 'w')
@@ -67,6 +80,7 @@ if (load_frontend):
 
 if (load_mongodb):
   client = MongoClient('mongodb+srv://idanhahn:idan1980@cluster0.bpwoj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+  client.drop_database(mongodb_name)
   db = client[mongodb_name]
   for collection in output:
     db[collection].insert_many(output[collection])
