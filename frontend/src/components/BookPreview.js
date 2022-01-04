@@ -17,18 +17,20 @@ import { addDays, differenceInCalendarDays } from 'date-fns';
 
 const GET_VEHICLE_WTIH_BOOKING = gql`
   query GET_VEHICLE_WITH_BOOKING($id: ID!) {
-    Vehicle(id: $id) {
-      id
+    vehicle(id: $id) {
+      _id
       img
       size
+      make
       model
+      year
       cost
       description
       vin
-      User {
+      owner {
         firstName
       }
-      Bookings {
+      bookings {
         from
         to
       }
@@ -100,7 +102,7 @@ export default function BookPreview({ vehicleId, handleClose }) {
         from: booking.fromDate,
         to: booking.toDate,
         cost: +`${
-          differenceInCalendarDays(toDate, fromDate) * data.Vehicle.cost
+          differenceInCalendarDays(toDate, fromDate) * data.vehicle.cost
         }`,
         user_id: '1',
         vehicle_id: vehicleId,
@@ -131,7 +133,7 @@ export default function BookPreview({ vehicleId, handleClose }) {
       <Box id="vehicleDetails" sx={{ display: 'flex', mb: 2 }}>
         {/* VEHICLE IMG */}
         <Box sx={{ mr: 6 }}>
-          <img style={vehicleImgStyle} src={data.Vehicle.img} alt="" />
+          <img style={vehicleImgStyle} src={data.vehicle.img} alt="" />
         </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -139,10 +141,10 @@ export default function BookPreview({ vehicleId, handleClose }) {
           <Typography
             variant="h4"
             color="primary"
-          >{`${data.Vehicle.model.make} ${data.Vehicle.model.name}`}</Typography>
+          >{`${data.vehicle.make} ${data.vehicle.model}`}</Typography>
           {/* DESCRIPTION */}
           <Typography variant="body1" color="secondary">
-            {data.Vehicle.description}
+            {data.vehicle.description}
           </Typography>
         </Box>
       </Box>
@@ -166,7 +168,7 @@ export default function BookPreview({ vehicleId, handleClose }) {
                 Owner name:
               </Typography>
               <Typography variant="h6" color="primary" component="span">
-                {data.Vehicle.User.firstName}
+                {data.vehicle.owner.firstName}
               </Typography>
             </Box>
 
@@ -179,7 +181,7 @@ export default function BookPreview({ vehicleId, handleClose }) {
                 VIN:
               </Typography>
               <Typography variant="h6" color="primary" component="span">
-                {data.Vehicle.vin}
+                {data.vehicle.vin}
               </Typography>
             </Box>
 
@@ -192,7 +194,7 @@ export default function BookPreview({ vehicleId, handleClose }) {
                 Size:
               </Typography>
               <Typography variant="h6" color="primary" component="span">
-                {data.Vehicle.size}
+                {data.vehicle.size}
               </Typography>
             </Box>
           </Box>
@@ -203,7 +205,7 @@ export default function BookPreview({ vehicleId, handleClose }) {
             {/* Daily COST */}
             <Box sx={{ mt: 1, px: 2 }}>
               <Typography variant="h4" color="secondary" sx={{ mb: 3 }}>
-                ${data.Vehicle.cost}{' '}
+                ${data.vehicle.cost}{' '}
                 <Typography component="span" color="secondary" variant="h6">
                   / DAY
                 </Typography>
@@ -250,7 +252,7 @@ export default function BookPreview({ vehicleId, handleClose }) {
                     <Typography variant="h5" color="primary">
                       $
                       {differenceInCalendarDays(toDate, fromDate) *
-                        data.Vehicle.cost}
+                        data.vehicle.cost}
                     </Typography>
                   </Box>
                 </Box>

@@ -32,6 +32,7 @@ export default function VehicleCard({ vehicle, handleOpenBook }) {
             height: '40px',
             width: '108px',
             borderRadius: '0 24px 24px 0',
+            borderColor: '#D3D3D3',
             boxShadow: '0 2px 4px 0 rgba(0,0,0,0.18)',
             display: 'flex',
             justifyContent: 'center',
@@ -45,7 +46,7 @@ export default function VehicleCard({ vehicle, handleOpenBook }) {
       </Box>
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography variant="h6" color="primary">
-          {`${vehicle.model.make} ${vehicle.model.name} (${vehicle.model.year})`}
+          {`${vehicle.make} ${vehicle.model} (${vehicle.year})`}
         </Typography>
         <Typography variant="body1" color="secondary" noWrap>
           {vehicle.description}
@@ -53,7 +54,7 @@ export default function VehicleCard({ vehicle, handleOpenBook }) {
       </CardContent>
       <CardActions>
         <Button variant="text">More details</Button>
-        <Button variant="outlined" onClick={() => handleOpenBook(vehicle.id)}>
+        <Button variant="outlined" onClick={() => handleOpenBook(vehicle._id)}>
           Book
         </Button>
       </CardActions>

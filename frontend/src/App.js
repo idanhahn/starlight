@@ -11,7 +11,7 @@ import Bookings from './pages/Bookings';
 import Profile from './pages/Profile';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5000',
+  uri: process.env.REACT_APP_SERVER_URI,
   cache: new InMemoryCache(),
 });
 

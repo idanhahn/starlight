@@ -27,17 +27,19 @@ const GET_VEHICLES = gql`
     $sortOrder: String
     $filter: VehicleFilter
   ) {
-    allVehicles(
+    vehicles(
       page: $page
       perPage: $perPage
       sortField: $sortField
       sortOrder: $sortOrder
       filter: $filter
     ) {
-      id
+      _id
       img
       size
+      make
       model
+      year
       cost
       description
     }
@@ -189,7 +191,7 @@ export default function Vehicles() {
 
       {/* VEHICLE LIST*/}
       {data &&
-        data.allVehicles.map((vehicle) => (
+        data.vehicles.map((vehicle) => (
           <Grid
             item
             xs={12}
